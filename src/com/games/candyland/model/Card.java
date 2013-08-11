@@ -1,10 +1,10 @@
 package com.games.candyland.model;
 
-public class ColoredSpace {
+public class Card {
 	
 	private String color;
 
-	public ColoredSpace(String color) {
+	public Card(String color) {
 		this.color = color;
 	}
 
