@@ -1,15 +1,9 @@
 package com.games.candyland.model;
 
-public class Card {
+public interface Card {
+
+	public boolean movePlayerOnBoard(GameBoard gameBoard);
 	
-	private String color;
-
-	public Card(String color) {
-		this.color = color;
-	}
-
-	public String getColor() {
-		return color;
-	}
-
+	public String getName();
+	
 }

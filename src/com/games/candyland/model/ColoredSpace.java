@@ -1,6 +1,6 @@
 package com.games.candyland.model;
 
-public class ColoredSpace {
+public class ColoredSpace implements Space {
 	
 	private String color;
 
@@ -12,4 +12,8 @@ public class ColoredSpace {
 		return color;
 	}
 
+	public String getName() {
+		return color;
+	}
+	
 }

@@ -1,11 +1,13 @@
 package com.games.candyland.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GameBoard {
 	
-	private List<ColoredSpace> spaces = new ArrayList<ColoredSpace>();
+	private List<Space> spaces = new ArrayList<Space>();
 	private CardDeck cardDeck = new CardDeck();
 	private List<Player> players = new ArrayList<Player>();
 	// Points to player whose turn it is next
@@ -23,11 +25,30 @@ public class GameBoard {
 		"Red"
 	};
 	
+	public static final Map<Integer, String> PICTURE_SPACE_POSITIONS = new HashMap<Integer, String>();
+	
+	static {
+		PICTURE_SPACE_POSITIONS.put(8,"CandyHeart");
+		PICTURE_SPACE_POSITIONS.put(16,"Peppermint Stick");
+		PICTURE_SPACE_POSITIONS.put(29,"Ginger Bread");
+		PICTURE_SPACE_POSITIONS.put(43,"Gum Drop");
+		PICTURE_SPACE_POSITIONS.put(76,"Peanut Brittle");
+		PICTURE_SPACE_POSITIONS.put(99,"Lollypop");
+		PICTURE_SPACE_POSITIONS.put(107,"Ice Cream");
+	}
+	
 	public GameBoard() {
 		// Create Spaces
+		int pos = 1;
 		for (int i = 0; i < NUMBER_SPACES; i++) {
+			String picture = PICTURE_SPACE_POSITIONS.get(pos);
+			if (picture != null) {
+				spaces.add(new PictureSpace(picture));
+				pos++;
+			}
 			String color = COLOR_SEQUENCE[i % COLOR_SEQUENCE.length];
 			spaces.add(new ColoredSpace(color));
+			pos++;
 		}
 		
 		// Shuffle the card deck
@@ -46,13 +67,14 @@ public class GameBoard {
 		System.out.println("Lets play CandyLand");
 		
 		System.out.println("\nSetting up spaces:");
-		for (ColoredSpace space : spaces) {
-			System.out.println(space.getColor());
+		int i = 1;
+		for (Space space : spaces) {
+			System.out.println(i++ + " " + space.getName());
 		}
 		
 		System.out.println("\nSetting up Card Deck:");
 		for (Card card : cardDeck.getCards()) {
-			System.out.println(card.getColor()+" Card");
+			System.out.println(card.getName()+" Card");
 		}
 		
 		while (nextTurn());
@@ -64,10 +86,10 @@ public class GameBoard {
 	private boolean nextTurn() {
 		// Player selects card from top of deck
 		Card currCard = cardDeck.takeTopCard();
-		System.out.println("  "+players.get(playerPointer).getName()+"'s turn ("+playerPositions[playerPointer]+") - has "+currCard.getColor()+" card");
+		System.out.println("  "+players.get(playerPointer).getName()+"'s turn ("+playerPositions[playerPointer]+") - has "+currCard.getName()+" card");
 		
 		// If the game has ended, return now
-		if (movePlayerOnBoard(currCard)) return false;
+		if (currCard.movePlayerOnBoard(this)) return false;
 		
 		// Next players turn
 		playerPointer = (playerPointer + 1) % players.size();
@@ -83,17 +105,39 @@ public class GameBoard {
 		}
 	}
 
-	private boolean movePlayerOnBoard(Card currCard) {
-		do {
-			playerPositions[playerPointer]++;
-			// Game ends when player reaches last space
-			if (playerPositions[playerPointer] >= spaces.size()) {
-				return true;
-			}
-			System.out.println("    "+players.get(playerPointer).getName()+" moved to "+spaces.get(playerPositions[playerPointer]).getColor());
-		} while(!spaces.get(playerPositions[playerPointer]).getColor().equals(currCard.getColor()));
+	public void incrementPlayersPosition() {
+		playerPositions[playerPointer]++;
+	}
+
+	public boolean hasPlayerReachedEnd() {
+		if (playerPositions[playerPointer] >= spaces.size()) {
+			return true;
+		}
 		return false;
 	}
 	
+	public String currPlayerName() {
+		return players.get(playerPointer).getName();		
+	}
 	
+	public String currPlayerSpaceName() {
+		return spaces.get(playerPositions[playerPointer]).getName();		
+	}
+
+	public int getPictureCardPosition(String picture) {
+		for (Map.Entry<Integer, String> entry : PICTURE_SPACE_POSITIONS.entrySet()) {
+			if (entry.getValue().equals(picture)) {
+				return entry.getKey();
+			}
+		}
+		return 0;
+	}
+
+	public int getPlayersPosition() {
+		return playerPositions[playerPointer];
+	}
+	
+	public void setPlayersPosition(int position) {
+		playerPositions[playerPointer] = position;
+	}
 }
